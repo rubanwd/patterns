@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Module Pattern</title>
+</head>
+<body>
+
+	<script>
+
+		// Observable
+		function Observable(){
+			var observers = [];
+			this.sendMessage = function( msg ){
+				for ( var i = 0, len = observers.length; i < len; i++ ){
+					observers[i].notify( msg );
+				}
+			};
+			this.addObserver = function( observer ){
+				observers.push( observer );
+			};	
+		}
+
+		// Observer
+		function Observer( behavior ){
+			this.notify = function( msg ){
+				behavior( msg );
+			}
+		}
+
+		// Interface
+		var observable = new Observable();
+		var obs1 = new Observer(function(msg){console.log(msg);})
+		var obs2 = new Observer(function(msg){alert(msg);})
+		observable.addObserver( obs1 );
+		observable.addObserver( obs2 );
+		setTimeout(function(){ observable.sendMessage('Текущая дата - ' + new Date()); }, 3000);
+
+
+	</script>
+
+</body>
+</html>

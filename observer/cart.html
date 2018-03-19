@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Module Pattern</title>
+
+
+	<style>
+		.product {
+			display: block;
+		}
+		.buy-modal {
+			position: absolute;
+			display: block;
+			width: 200px;
+			height: 200px;
+			padding: 10px;
+			left: 0;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			margin: auto;
+			background-color: #ccc;
+		}
+		.buy-modal_hide {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="products">
+		<button class="product" data-id="1">Товар 1</button>
+		<button class="product" data-id="2">Товар 2</button>
+		<button class="product" data-id="3">Товар 3</button>
+		<button class="product" data-id="4">Товар 4</button>
+	</div>
+
+	<div class="basket">
+		<h3 class="basket__title">Корзина</h3>
+		<ul class="basket__products-list"></ul>
+	</div>
+
+	<div class="buy-modal buy-modal_hide">
+		<h3 class="buy-modal__title">Поздравляем!</h3>
+		<span class="buy-modal_message"></span>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+	<script>
+
+		// Observable
+		function Observable(){
+			var observers = [];
+			this.sendMessage = function( msg ){
+				for ( var i = 0, len = observers.length; i < len; i++ ){
+					observers[i].notify( msg );
+				}
+			};
+			this.addObserver = function( observer ){
+				observers.push( observer );
+			};	
+		}
+
+		// Observer
+		function Observer( behavior ){
+			this.notify = function( msg ){
+				behavior( msg );
+			}
+		}
+
+		// Interface
+		var observable = new Observable();
+
+		var basketObs = new Observer(function(id){
+			$('.basket__products-list').append(
+				$('<li></li>')
+					.addClass('basket__product')
+					.text('Товар ' + id)
+			);
+
+		});
+
+		var modalObs = new Observer(function(id){
+			var msg = 'Товар ' + id + ' добавлен в корзину!';
+			$('.buy-modal_message').text( msg );
+			$('.buy-modal').removeClass('buy-modal_hide');
+			setTimeout(function(){$('.buy-modal').addClass('buy-modal_hide');}, 3000);
+		})
+
+		var serverObs = new Observer(function(id){
+			
+			console.log('message: ', + id);
+		})
+
+		observable.addObserver( basketObs );
+		observable.addObserver( modalObs );
+		observable.addObserver( serverObs );
+		
+
+		$('.product').click(function(){
+			var id = $(this).attr('data-id');
+			observable.sendMessage( id );
+		})
+
+
+	</script>
+
+</body>
+</html>
